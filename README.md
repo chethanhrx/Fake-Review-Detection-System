@@ -278,7 +278,6 @@ sudo apt install python-is-python3
 
 <div align="center">
 
-<img src="https://github.com/chethanhrx.png" width="100" style="border-radius: 50%;" />
 
 ### [@chethanhrx](https://github.com/chethanhrx)
 
