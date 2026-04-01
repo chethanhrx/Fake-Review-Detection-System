@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% block title %}ReviewGuard — Detect Fake Reviews Instantly{% endblock %}
+{% block extra_head %}
+<style>
+.hero {
+    min-height: 92vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 4rem 2rem;
+    position: relative; overflow: hidden;
+}
+.hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(0,201,167,0.08) 0%, transparent 70%);
+    top: 50%; left: 50%; transform: translate(-50%, -60%);
+    pointer-events: none;
+}
+.hero-glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(245,200,66,0.05) 0%, transparent 70%);
+    bottom: 10%; right: 10%;
+    pointer-events: none;
+}
+.hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(0,201,167,0.08);
+    border: 1px solid rgba(0,201,167,0.2);
+    color: var(--teal);
+    padding: 0.4rem 1rem; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 1.8rem;
+    animation: fadeUp 0.6s ease both;
+}
+.hero h1 {
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 800; line-height: 1.08; letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s ease 0.1s both;
+}
+.hero h1 .teal { color: var(--teal); }
+.hero h1 .gold { color: var(--gold); }
+.hero-sub {
+    font-size: 1.15rem; color: var(--muted); max-width: 560px;
+    line-height: 1.7; margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s ease 0.2s both;
+}
+.hero-btns {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.6s ease 0.3s both;
+}
+.hero-btns .btn { padding: 0.8rem 2rem; font-size: 0.95rem; }
+
+/* FLOATING BADGES */
+.float-badge {
+    position: absolute;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.6rem 1rem;
+    font-size: 0.8rem; font-weight: 600;
+    display: flex; align-items: center; gap: 0.5rem;
+    animation: float 4s ease-in-out infinite;
+    backdrop-filter: blur(10px);
+}
+.float-badge.cg { left: 8%; top: 30%; color: var(--red); border-color: rgba(255,77,109,0.3); animation-delay: 0s; }
+.float-badge.or { right: 8%; top: 35%; color: var(--teal); border-color: rgba(0,201,167,0.3); animation-delay: 1.5s; }
+.float-badge.conf { right: 12%; bottom: 25%; color: var(--gold); border-color: rgba(245,200,66,0.3); animation-delay: 0.8s; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+/* STATS STRIP */
+.stats-strip {
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1rem; text-align: center;
+}
+.strip-stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem; font-weight: 800; color: var(--teal);
+}
+.strip-stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+
+/* FEATURES */
+.features { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+.features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem; margin-top: 3rem;
+}
+.feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem;
+    transition: all 0.3s;
+    position: relative; overflow: hidden;
+}
+.feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    opacity: 0; transition: opacity 0.3s;
+}
+.feature-card:hover { transform: translateY(-4px); border-color: rgba(0,201,167,0.3); }
+.feature-card:hover::before { opacity: 1; }
+.feature-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: rgba(0,201,167,0.1); color: var(--teal);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1.2rem;
+}
+.feature-card h3 { font-size: 1.1rem; margin-bottom: 0.6rem; }
+.feature-card p { color: var(--muted); font-size: 0.875rem; line-height: 1.7; }
+
+/* HOW IT WORKS TEASER */
+.howitworks-teaser { padding: 5rem 2rem; background: var(--bg2); }
+.howitworks-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+.steps-row { display: flex; align-items: flex-start; gap: 0; margin-top: 3rem; position: relative; }
+.step-item { flex: 1; text-align: center; padding: 0 1rem; position: relative; }
+.step-num {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--bg3); border: 2px solid var(--teal);
+    color: var(--teal); font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+}
+.step-connector {
+    position: absolute; top: 24px; left: calc(50% + 24px); right: calc(-50% + 24px);
+    height: 2px; background: var(--border);
+}
+.step-item:last-child .step-connector { display: none; }
+.step-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+.step-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+/* CTA */
+.cta-section {
+    padding: 6rem 2rem; text-align: center;
+    background: radial-gradient(ellipse at center, rgba(0,201,167,0.06) 0%, transparent 70%);
+}
+.cta-section h2 { font-size: 2.5rem; margin-bottom: 1rem; }
+.cta-section p { color: var(--muted); margin-bottom: 2rem; font-size: 1rem; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 768px) {
+    .float-badge { display: none; }
+    .stats-strip { grid-template-columns: 1fr 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .steps-row { flex-direction: column; gap: 1.5rem; }
+    .step-connector { display: none; }
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-glow2"></div>
+
+    <div class="float-badge cg"><i class="fas fa-robot"></i> CG — 87.4% Confidence</div>
+    <div class="float-badge or"><i class="fas fa-user-check"></i> OR — 92.1% Confidence</div>
+    <div class="float-badge conf"><i class="fas fa-chart-pie"></i> 94.7% Accuracy</div>
+
+    <div class="hero-eyebrow"><i class="fas fa-bolt"></i> AI-Powered Detection</div>
+    <h1>Spot the <span class="teal">Fake</span> from the<br><span class="gold">Real</span> Reviews</h1>
+    <p class="hero-sub">ReviewGuard uses intelligent text analysis to classify reviews as <strong>Computer Generated (CG)</strong> or <strong>Original Human (OR)</strong> — protecting consumers from deceptive content.</p>
+    <div class="hero-btns">
+        <a href="/users/register/" class="btn btn-primary"><i class="fas fa-rocket"></i> Get Started Free</a>
+        <a href="/how-it-works/" class="btn btn-ghost"><i class="fas fa-play"></i> How It Works</a>
+    </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+    <div>
+        <div class="strip-stat-num">{{ total_reviews|default:0 }}+</div>
+        <div class="strip-stat-label">Reviews Analyzed</div>
+    </div>
+    <div>
+        <div class="strip-stat-num">{{ total_users|default:0 }}+</div>
+        <div class="strip-stat-label">Registered Users</div>
+    </div>
+    <div>
+        <div class="strip-stat-num">94.7%</div>
+        <div class="strip-stat-label">Detection Accuracy</div>
+    </div>
+    <div>
+        <div class="strip-stat-num">{{ cg_count|default:0 }}</div>
+        <div class="strip-stat-label">Fake Reviews Caught</div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features">
+    <div style="text-align:center">
+        <div class="section-tag">Features</div>
+        <h2 style="font-size:2.2rem; margin-bottom:0.8rem;">Why Choose ReviewGuard?</h2>
+        <p style="color:var(--muted); max-width:500px; margin:0 auto; font-size:0.95rem; line-height:1.7;">Everything you need to identify and understand fake reviews in one powerful platform.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-brain"></i></div>
+            <h3>Smart NLP Detection</h3>
+            <p>Multi-layered text analysis inspects sentence patterns, vocabulary, personal markers, and structural uniformity to classify reviews accurately.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(245,200,66,0.1);color:var(--gold)"><i class="fas fa-gauge-high"></i></div>
+            <h3>Confidence Scoring</h3>
+            <p>Every result includes a confidence percentage so you know exactly how certain the system is about each classification.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(255,77,109,0.1);color:var(--red)"><i class="fas fa-history"></i></div>
+            <h3>Review History</h3>
+            <p>Track all your submitted reviews with full history, filtering by CG or OR results, and manage your analysis records easily.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(100,160,255,0.1);color:#64a0ff"><i class="fas fa-shield-halved"></i></div>
+            <h3>Secure Access</h3>
+            <p>Separate user and admin authentication systems ensure only registered users access the platform and only verified admins manage it.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(0,201,167,0.1);color:var(--teal)"><i class="fas fa-chart-bar"></i></div>
+            <h3>Admin Analytics</h3>
+            <p>Administrators get a full analytics dashboard with charts, user activity monitoring, review trends, and override capabilities.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(245,200,66,0.1);color:var(--gold)"><i class="fas fa-bolt"></i></div>
+            <h3>Instant Results</h3>
+            <p>Get your CG or OR classification in under a second with detailed reasons explaining why the review was flagged as fake or genuine.</p>
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS TEASER -->
+<section class="howitworks-teaser">
+    <div class="howitworks-inner">
+        <div class="section-tag">Process</div>
+        <h2 style="font-size:2rem; margin-bottom:0.5rem;">How Detection Works</h2>
+        <p style="color:var(--muted); font-size:0.9rem;">A simple 4-step process from submission to classification.</p>
+        <div class="steps-row">
+            <div class="step-item">
+                <div class="step-num">1</div>
+                <div class="step-connector"></div>
+                <div class="step-title">Submit Review</div>
+                <div class="step-desc">Paste any product or service review into the analyzer</div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">2</div>
+                <div class="step-connector"></div>
+                <div class="step-title">Text Analysis</div>
+                <div class="step-desc">NLP engine extracts linguistic features and patterns</div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">3</div>
+                <div class="step-connector"></div>
+                <div class="step-title">Classification</div>
+                <div class="step-desc">Model classifies as CG (fake) or OR (original)</div>
+            </div>
+            <div class="step-item">
+                <div class="step-num">4</div>
+                <div class="step-title">Get Result</div>
+                <div class="step-desc">See your result with confidence score and detailed reasons</div>
+            </div>
+        </div>
+        <div style="margin-top:2.5rem">
+            <a href="/how-it-works/" class="btn btn-ghost"><i class="fas fa-arrow-right"></i> Learn More</a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="section-tag">Get Started</div>
+    <h2>Ready to <span style="color:var(--teal)">Detect</span> Fake Reviews?</h2>
+    <p>Join ReviewGuard and start protecting yourself from computer-generated deception.</p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap">
+        <a href="/users/register/" class="btn btn-primary" style="padding:0.9rem 2.2rem; font-size:1rem"><i class="fas fa-user-plus"></i> Create Free Account</a>
+        <a href="/admin-panel/login/" class="btn btn-ghost" style="padding:0.9rem 2.2rem; font-size:1rem"><i class="fas fa-lock"></i> Admin Login</a>
+    </div>
+</section>
+{% endblock %}

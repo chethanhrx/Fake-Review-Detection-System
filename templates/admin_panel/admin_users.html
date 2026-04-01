@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Users — ReviewGuard Admin{% endblock %}
+{% block content %}
+<style>
+.admin-page { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+.admin-nav-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.admin-pill { padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; color: var(--muted); background: var(--bg3); border: 1px solid var(--border); transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; }
+.admin-pill:hover, .admin-pill.active { background: var(--teal); color: var(--bg); border-color: var(--teal); }
+</style>
+<div class="admin-page">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem">
+        <div>
+            <h1 style="font-size:1.8rem">All Users</h1>
+            <p style="color:var(--muted); font-size:0.875rem; margin-top:0.2rem">{{ users.count }} registered users</p>
+        </div>
+        <a href="/admin-panel/dashboard/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    </div>
+
+    <div class="admin-nav-pills">
+        <a href="/admin-panel/dashboard/" class="admin-pill"><i class="fas fa-gauge-high"></i> Dashboard</a>
+        <a href="/admin-panel/reviews/" class="admin-pill"><i class="fas fa-file-lines"></i> All Reviews</a>
+        <a href="/admin-panel/users/" class="admin-pill active"><i class="fas fa-users"></i> Users</a>
+        <a href="/admin-panel/register/" class="admin-pill"><i class="fas fa-user-plus"></i> Add Admin</a>
+    </div>
+
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Reviews</th>
+                    <th>Joined</th>
+                    <th>Last Login</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="color:var(--muted)">{{ u.id }}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:0.75rem">
+                            <div style="width:34px; height:34px; border-radius:50%; background:var(--bg3); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem; color:var(--teal); flex-shrink:0">{{ u.username|first|upper }}</div>
+                            <div>
+                                <div style="font-weight:600; font-size:0.875rem">{{ u.get_full_name|default:u.username }}</div>
+                                <div style="font-size:0.75rem; color:var(--muted)">@{{ u.username }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="color:var(--muted); font-size:0.82rem">{{ u.email|default:"—" }}</td>
+                    <td>
+                        <span style="font-family:'Syne',sans-serif; font-weight:700; color:var(--teal)">{{ u.review_count }}</span>
+                        <span style="color:var(--muted); font-size:0.78rem"> reviews</span>
+                    </td>
+                    <td style="color:var(--muted); font-size:0.82rem">{{ u.date_joined|date:"M d, Y" }}</td>
+                    <td style="color:var(--muted); font-size:0.82rem">{{ u.last_login|date:"M d, Y"|default:"Never" }}</td>
+                    <td>
+                        {% if u.is_active %}
+                        <span class="badge badge-or"><i class="fas fa-circle" style="font-size:0.5rem"></i> Active</span>
+                        {% else %}
+                        <span class="badge badge-cg"><i class="fas fa-circle" style="font-size:0.5rem"></i> Inactive</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--muted)">No users found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

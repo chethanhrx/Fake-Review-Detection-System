@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}My Dashboard — ReviewGuard{% endblock %}
+{% block content %}
+<style>
+.dashboard { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+.dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
+.dash-welcome h1 { font-size: 1.8rem; }
+.dash-welcome p { color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2.5rem; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.section-head h2 { font-size: 1.1rem; }
+.empty-state { text-align: center; padding: 3rem; color: var(--muted); }
+.empty-state i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; display: block; }
+.review-row { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: 10px; background: var(--bg2); border: 1px solid var(--border); margin-bottom: 0.75rem; }
+.review-row-info { flex: 1; min-width: 0; }
+.review-row-product { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.review-row-text { font-size: 0.8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.review-row-meta { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+@media(max-width:768px){ .stats-row{grid-template-columns:1fr;} .dash-header{flex-direction:column;align-items:flex-start;} }
+</style>
+
+<div class="dashboard">
+    <div class="dash-header">
+        <div class="dash-welcome">
+            <h1>Hello, {{ user.first_name|default:user.username }} 👋</h1>
+            <p>Here's your ReviewGuard activity overview</p>
+        </div>
+        <a href="/reviews/submit/" class="btn btn-primary"><i class="fas fa-plus"></i> Analyze New Review</a>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-teal"><i class="fas fa-file-lines"></i></div>
+            <div>
+                <div class="stat-value">{{ total }}</div>
+                <div class="stat-label">Total Reviews</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-red"><i class="fas fa-robot"></i></div>
+            <div>
+                <div class="stat-value" style="color:var(--red)">{{ cg_count }}</div>
+                <div class="stat-label">CG Detected</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-teal"><i class="fas fa-user-check"></i></div>
+            <div>
+                <div class="stat-value" style="color:var(--teal)">{{ or_count }}</div>
+                <div class="stat-label">OR (Original)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="section-head">
+            <h2><i class="fas fa-clock" style="color:var(--teal); margin-right:0.5rem"></i> Recent Reviews</h2>
+            <a href="/reviews/my-reviews/" class="btn btn-ghost btn-sm">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        {% if recent_reviews %}
+            {% for review in recent_reviews %}
+            <div class="review-row">
+                <div class="review-row-info">
+                    <div class="review-row-product">{{ review.product_name }}</div>
+                    <div class="review-row-text">{{ review.short_text }}</div>
+                </div>
+                <span class="badge {% if review.result == 'CG' %}badge-cg{% else %}badge-or{% endif %}">
+                    {% if review.result == 'CG' %}<i class="fas fa-robot"></i>{% else %}<i class="fas fa-user-check"></i>{% endif %}
+                    {{ review.result }}
+                </span>
+                <div class="review-row-meta">{{ review.confidence }}%</div>
+                <div class="review-row-meta">{{ review.created_at|date:"M d" }}</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No reviews yet.</p>
+                <a href="/reviews/submit/" class="btn btn-primary btn-sm" style="margin-top:1rem"><i class="fas fa-plus"></i> Analyze Your First Review</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap">
+        <a href="/reviews/submit/" class="btn btn-ghost"><i class="fas fa-search"></i> Analyze Review</a>
+        <a href="/reviews/my-reviews/" class="btn btn-ghost"><i class="fas fa-list"></i> All My Reviews</a>
+        <a href="/users/logout/" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}Review Management — ReviewGuard Admin{% endblock %}
+{% block content %}
+<style>
+.admin-page { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.admin-nav-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.admin-pill { padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; color: var(--muted); background: var(--bg3); border: 1px solid var(--border); transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem; }
+.admin-pill:hover, .admin-pill.active { background: var(--teal); color: var(--bg); border-color: var(--teal); }
+.filter-bar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.search-input { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 0.55rem 1rem; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; outline: none; min-width: 220px; }
+.search-input:focus { border-color: var(--teal); }
+.filter-tabs { display: flex; gap: 0.4rem; }
+.filter-tab { padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-decoration: none; border: 1px solid var(--border); color: var(--muted); transition: all 0.2s; }
+.filter-tab.active-all { background: var(--bg3); color: var(--text); }
+.filter-tab.active-cg { background: rgba(255,77,109,0.12); color: var(--red); border-color: rgba(255,77,109,0.3); }
+.filter-tab.active-or { background: rgba(0,201,167,0.12); color: var(--teal); border-color: rgba(0,201,167,0.3); }
+.filter-tab.active-flagged { background: rgba(245,200,66,0.12); color: var(--gold); border-color: rgba(245,200,66,0.3); }
+.table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.data-table td { font-size: 0.82rem; max-width: 200px; }
+.review-text-cell { max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+.action-btns { display: flex; gap: 0.4rem; }
+.override-form { display: inline; }
+</style>
+
+<div class="admin-page">
+    <div class="page-header">
+        <div>
+            <h1 style="font-size:1.8rem">Review Management</h1>
+            <p style="color:var(--muted); font-size:0.875rem; margin-top:0.2rem">View, filter, flag & override all submitted reviews</p>
+        </div>
+        <a href="/admin-panel/dashboard/" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    </div>
+
+    <div class="admin-nav-pills">
+        <a href="/admin-panel/dashboard/" class="admin-pill"><i class="fas fa-gauge-high"></i> Dashboard</a>
+        <a href="/admin-panel/reviews/" class="admin-pill active"><i class="fas fa-file-lines"></i> All Reviews</a>
+        <a href="/admin-panel/users/" class="admin-pill"><i class="fas fa-users"></i> Users</a>
+        <a href="/admin-panel/register/" class="admin-pill"><i class="fas fa-user-plus"></i> Add Admin</a>
+    </div>
+
+    <!-- Stats mini -->
+    <div style="display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap">
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.8rem 1.2rem; font-size:0.85rem"><strong style="font-family:'Syne',sans-serif; font-size:1.3rem; display:block">{{ total }}</strong>Total</div>
+        <div style="background:var(--card); border:1px solid rgba(255,77,109,0.25); border-radius:10px; padding:0.8rem 1.2rem; font-size:0.85rem"><strong style="font-family:'Syne',sans-serif; font-size:1.3rem; display:block; color:var(--red)">{{ cg_count }}</strong>CG Reviews</div>
+        <div style="background:var(--card); border:1px solid rgba(0,201,167,0.25); border-radius:10px; padding:0.8rem 1.2rem; font-size:0.85rem"><strong style="font-family:'Syne',sans-serif; font-size:1.3rem; display:block; color:var(--teal)">{{ or_count }}</strong>OR Reviews</div>
+        <div style="background:var(--card); border:1px solid rgba(245,200,66,0.25); border-radius:10px; padding:0.8rem 1.2rem; font-size:0.85rem"><strong style="font-family:'Syne',sans-serif; font-size:1.3rem; display:block; color:var(--gold)">{{ flagged_count }}</strong>Flagged</div>
+    </div>
+
+    <div class="filter-bar">
+        <form method="GET" style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center">
+            <input type="text" name="search" class="search-input" placeholder="Search by user or product..." value="{{ search }}">
+            <input type="hidden" name="filter" value="{{ filter_type }}">
+            <button type="submit" class="btn btn-ghost btn-sm"><i class="fas fa-search"></i> Search</button>
+        </form>
+        <div class="filter-tabs">
+            <a href="?filter=all" class="filter-tab {% if filter_type == 'all' %}active-all{% endif %}">All</a>
+            <a href="?filter=CG" class="filter-tab {% if filter_type == 'CG' %}active-cg{% endif %}">CG</a>
+            <a href="?filter=OR" class="filter-tab {% if filter_type == 'OR' %}active-or{% endif %}">OR</a>
+            <a href="?filter=flagged" class="filter-tab {% if filter_type == 'flagged' %}active-flagged{% endif %}">Flagged</a>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Product</th>
+                    <th>Review</th>
+                    <th>Result</th>
+                    <th>Override</th>
+                    <th>Confidence</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr>
+                    <td style="color:var(--muted)">{{ review.id }}</td>
+                    <td>
+                        <div style="font-weight:600; font-size:0.85rem">{{ review.user.username }}</div>
+                        <div style="font-size:0.75rem; color:var(--muted)">{{ review.user.email|default:"" }}</div>
+                    </td>
+                    <td style="font-weight:600; font-size:0.85rem">{{ review.product_name|truncatechars:25 }}</td>
+                    <td class="review-text-cell" title="{{ review.review_text }}">{{ review.short_text }}</td>
+                    <td>
+                        <span class="badge {% if review.result == 'CG' %}badge-cg{% else %}badge-or{% endif %}">
+                            {{ review.result }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if review.admin_override %}
+                            <span class="badge badge-flag"><i class="fas fa-pen"></i> {{ review.admin_override }}</span>
+                        {% else %}
+                            <span style="color:var(--muted); font-size:0.78rem">—</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:var(--muted)">{{ review.confidence }}%</td>
+                    <td style="color:var(--muted); white-space:nowrap">{{ review.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="action-btns">
+                            <!-- Flag -->
+                            <a href="/admin-panel/reviews/flag/{{ review.id }}/"
+                               class="btn btn-sm {% if review.is_flagged %}btn-gold{% else %}btn-ghost{% endif %}"
+                               title="{% if review.is_flagged %}Unflag{% else %}Flag{% endif %}">
+                                <i class="fas fa-flag"></i>
+                            </a>
+                            <!-- Override -->
+                            <form class="override-form" method="POST" action="/admin-panel/reviews/override/{{ review.id }}/">
+                                {% csrf_token %}
+                                <select name="new_result" class="form-select" style="padding:0.3rem 0.5rem; font-size:0.78rem; width:70px" onchange="this.form.submit()">
+                                    <option value="">Set</option>
+                                    <option value="CG" {% if review.admin_override == 'CG' %}selected{% endif %}>→ CG</option>
+                                    <option value="OR" {% if review.admin_override == 'OR' %}selected{% endif %}>→ OR</option>
+                                </select>
+                            </form>
+                            <!-- Delete -->
+                            <a href="/admin-panel/reviews/delete/{{ review.id }}/"
+                               onclick="return confirm('Delete this review permanently?')"
+                               class="btn btn-danger btn-sm" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" style="text-align:center; padding:3rem; color:var(--muted)"><i class="fas fa-inbox" style="display:block; font-size:2rem; margin-bottom:0.8rem; opacity:0.3"></i>No reviews found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Admin Register — ReviewGuard{% endblock %}
+{% block content %}
+<style>
+.auth-page { min-height: 88vh; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+.auth-card { width: 100%; max-width: 480px; }
+.auth-header { text-align: center; margin-bottom: 2rem; }
+.auth-header h1 { font-size: 2rem; margin-bottom: 0.4rem; }
+.auth-header p { color: var(--muted); font-size: 0.9rem; }
+.auth-logo { font-size: 2.5rem; color: var(--gold); margin-bottom: 1rem; }
+.auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--muted); }
+.auth-footer a { color: var(--teal); text-decoration: none; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.secret-notice {
+    background: rgba(245,200,66,0.08); border: 1px solid rgba(245,200,66,0.25);
+    border-radius: 8px; padding: 0.75rem 1rem;
+    font-size: 0.82rem; color: var(--gold); margin-bottom: 1.5rem;
+    display: flex; align-items: flex-start; gap: 0.5rem;
+}
+</style>
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="card card-glow" style="border-color: rgba(245,200,66,0.2)">
+            <div class="auth-header">
+                <div class="auth-logo"><i class="fas fa-user-shield"></i></div>
+                <h1>Admin Register</h1>
+                <p>Create a new administrator account</p>
+            </div>
+            <div class="secret-notice">
+                <i class="fas fa-key" style="margin-top:2px; flex-shrink:0"></i>
+                <span>A valid <strong>Admin Secret Key</strong> is required to register. Contact the system owner to obtain it.</span>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" name="first_name" class="form-input" placeholder="Admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" name="last_name" class="form-input" placeholder="User" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-input" placeholder="admin_username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-input" placeholder="admin@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-key" style="color:var(--gold)"></i> Admin Secret Key</label>
+                    <input type="password" name="secret_key" class="form-input" placeholder="Enter the admin secret key" required style="border-color:rgba(245,200,66,0.3)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password1" class="form-input" placeholder="Minimum 8 characters" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="password2" class="form-input" placeholder="Re-enter password" required>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; padding:0.8rem; font-size:0.95rem; margin-top:0.5rem">
+                    <i class="fas fa-user-shield"></i> Register as Admin
+                </button>
+            </form>
+        </div>
+        <div class="auth-footer">
+            Already an admin? <a href="/admin-panel/login/">Admin Login</a>
+            &nbsp;·&nbsp; Regular user? <a href="/users/register/">User Register</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ReviewGuard — Fake Review Detection{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #080f14;
+            --bg2: #0d1a24;
+            --bg3: #112233;
+            --teal: #00c9a7;
+            --teal2: #00e5c0;
+            --gold: #f5c842;
+            --red: #ff4d6d;
+            --text: #e8f0f7;
+            --muted: #7a99b0;
+            --border: #1e3347;
+            --card: #0f1f2e;
+            --cg-color: #ff4d6d;
+            --or-color: #00c9a7;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        /* NOISE TEXTURE OVERLAY */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        /* NAV */
+        nav {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(8,15,20,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 64px;
+        }
+        .nav-logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800; font-size: 1.3rem;
+            color: var(--teal);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .nav-logo span { color: var(--gold); }
+        .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover { color: var(--text); background: var(--bg3); }
+        .nav-links a.active { color: var(--teal); }
+        .nav-btn {
+            background: var(--teal) !important;
+            color: var(--bg) !important;
+            font-weight: 600 !important;
+            padding: 0.4rem 1.1rem !important;
+        }
+        .nav-btn:hover { background: var(--teal2) !important; }
+        .nav-btn-outline {
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+        }
+
+        /* MESSAGES */
+        .messages-container { position: fixed; top: 70px; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+        .msg {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex; align-items: center; gap: 0.6rem;
+            animation: slideIn 0.3s ease;
+            max-width: 340px;
+            backdrop-filter: blur(10px);
+        }
+        .msg-success { background: rgba(0,201,167,0.15); border: 1px solid rgba(0,201,167,0.4); color: var(--teal); }
+        .msg-error { background: rgba(255,77,109,0.15); border: 1px solid rgba(255,77,109,0.4); color: var(--red); }
+        .msg-info { background: rgba(245,200,66,0.15); border: 1px solid rgba(245,200,66,0.4); color: var(--gold); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* CONTENT WRAPPER */
+        .page-content { position: relative; z-index: 1; }
+
+        /* CARDS */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .card-glow {
+            box-shadow: 0 0 40px rgba(0,201,167,0.06);
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; border: none; text-decoration: none;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-primary { background: var(--teal); color: var(--bg); }
+        .btn-primary:hover { background: var(--teal2); transform: translateY(-1px); }
+        .btn-danger { background: rgba(255,77,109,0.15); color: var(--red); border: 1px solid rgba(255,77,109,0.3); }
+        .btn-danger:hover { background: rgba(255,77,109,0.25); }
+        .btn-ghost { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+        .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+        .btn-gold { background: var(--gold); color: var(--bg); }
+        .btn-gold:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
+
+        /* BADGES */
+        .badge {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            padding: 0.2rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+        }
+        .badge-cg { background: rgba(255,77,109,0.15); color: var(--red); border: 1px solid rgba(255,77,109,0.3); }
+        .badge-or { background: rgba(0,201,167,0.15); color: var(--teal); border: 1px solid rgba(0,201,167,0.3); }
+        .badge-flag { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+
+        /* FORM INPUTS */
+        .form-group { margin-bottom: 1.2rem; }
+        .form-label {
+            display: block; margin-bottom: 0.4rem;
+            font-size: 0.8rem; font-weight: 600;
+            color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 0.7rem 1rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(0,201,167,0.12);
+        }
+        .form-textarea { resize: vertical; min-height: 130px; }
+        .form-select option { background: var(--bg2); }
+        .error-list { margin-top: 0.4rem; }
+        .error-list li { color: var(--red); font-size: 0.8rem; list-style: none; }
+
+        /* TABLES */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.75rem; font-weight: 700;
+            color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td {
+            padding: 0.85rem 1rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid rgba(30,51,71,0.5);
+            vertical-align: middle;
+        }
+        .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* STAT CARDS */
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.3rem 1.5rem;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .stat-icon {
+            width: 46px; height: 46px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .stat-icon-teal { background: rgba(0,201,167,0.12); color: var(--teal); }
+        .stat-icon-red { background: rgba(255,77,109,0.12); color: var(--red); }
+        .stat-icon-gold { background: rgba(245,200,66,0.12); color: var(--gold); }
+        .stat-icon-blue { background: rgba(100,160,255,0.12); color: #64a0ff; }
+        .stat-value { font-family: 'Syne', sans-serif; font-size: 1.7rem; font-weight: 800; line-height: 1; }
+        .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.82rem;
+            margin-top: 4rem;
+        }
+        footer a { color: var(--teal); text-decoration: none; }
+
+        /* SECTION TITLES */
+        .section-tag {
+            display: inline-block;
+            background: rgba(0,201,167,0.1);
+            color: var(--teal);
+            border: 1px solid rgba(0,201,167,0.25);
+            padding: 0.3rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; margin-bottom: 1rem;
+        }
+        h1, h2, h3 { font-family: 'Syne', sans-serif; }
+
+        /* GRID UTILS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+
+        /* DIVIDER */
+        .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<nav>
+    <a href="/" class="nav-logo"><i class="fas fa-shield-halved"></i> Review<span>Guard</span></a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/about/">About</a>
+        <a href="/how-it-works/">How It Works</a>
+        {% if user.is_authenticated and not user.is_staff %}
+            <a href="/reviews/submit/">Submit Review</a>
+            <a href="/reviews/my-reviews/">My Reviews</a>
+            <a href="/users/dashboard/">Dashboard</a>
+            <a href="/users/logout/" class="btn nav-btn-outline">Logout</a>
+        {% elif user.is_authenticated and user.is_staff %}
+            <a href="/admin-panel/dashboard/">Admin Panel</a>
+            <a href="/admin-panel/logout/" class="btn nav-btn-outline">Logout</a>
+        {% else %}
+            <a href="/users/login/">Login</a>
+            <a href="/users/register/" class="btn nav-btn">Get Started</a>
+        {% endif %}
+    </div>
+</nav>
+
+{% if messages %}
+<div class="messages-container">
+    {% for message in messages %}
+    <div class="msg msg-{{ message.tags }}">
+        {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>
+        {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle"></i>
+        {% else %}<i class="fas fa-info-circle"></i>{% endif %}
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="page-content">
+    {% block content %}{% endblock %}
+</div>
+
+<footer>
+    <p>© 2024 <a href="/">ReviewGuard</a> — Fake Review Detection System &nbsp;|&nbsp; Built with Django &nbsp;|&nbsp; CG vs OR Classification</p>
+</footer>
+
+<script>
+    // Auto-dismiss messages
+    setTimeout(() => {
+        document.querySelectorAll('.msg').forEach(m => {
+            m.style.transition = 'all 0.4s';
+            m.style.opacity = '0';
+            m.style.transform = 'translateX(120%)';
+            setTimeout(() => m.remove(), 400);
+        });
+    }, 4000);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

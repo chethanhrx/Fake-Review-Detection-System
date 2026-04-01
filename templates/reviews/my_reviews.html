@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}My Reviews — ReviewGuard{% endblock %}
+{% block content %}
+<style>
+.reviews-page { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.filter-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.filter-tab {
+    padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+    text-decoration: none; border: 1px solid var(--border); color: var(--muted);
+    transition: all 0.2s;
+}
+.filter-tab:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.filter-tab.active-all { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.2); }
+.filter-tab.active-cg { background: rgba(255,77,109,0.12); color: var(--red); border-color: rgba(255,77,109,0.3); }
+.filter-tab.active-or { background: rgba(0,201,167,0.12); color: var(--teal); border-color: rgba(0,201,167,0.3); }
+.stats-mini { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.stat-mini { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 1.2rem; font-size: 0.85rem; }
+.stat-mini strong { font-family: 'Syne', sans-serif; font-size: 1.4rem; display: block; }
+.empty-state { text-align: center; padding: 4rem; color: var(--muted); }
+.empty-state i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; display: block; }
+.review-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.3rem 1.5rem; margin-bottom: 1rem; transition: border-color 0.2s; }
+.review-card:hover { border-color: rgba(255,255,255,0.15); }
+.review-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; }
+.review-card-title { font-weight: 700; font-size: 0.95rem; }
+.review-card-cat { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; text-transform: capitalize; }
+.review-card-body { font-size: 0.87rem; color: var(--muted); line-height: 1.7; margin-bottom: 0.8rem; }
+.review-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.78rem; color: var(--muted); }
+</style>
+
+<div class="reviews-page">
+    <div class="page-header">
+        <div>
+            <h1 style="font-size:1.8rem;">My Reviews</h1>
+            <p style="color:var(--muted); font-size:0.875rem; margin-top:0.2rem">All reviews you've analyzed</p>
+        </div>
+        <a href="/reviews/submit/" class="btn btn-primary"><i class="fas fa-plus"></i> New Analysis</a>
+    </div>
+
+    <div class="stats-mini">
+        <div class="stat-mini"><strong>{{ total }}</strong> Total</div>
+        <div class="stat-mini"><strong style="color:var(--red)">{{ cg_count }}</strong> CG Reviews</div>
+        <div class="stat-mini"><strong style="color:var(--teal)">{{ or_count }}</strong> OR Reviews</div>
+    </div>
+
+    <div class="filter-tabs" style="margin-bottom:1.5rem">
+        <a href="?filter=all" class="filter-tab {% if filter_type == 'all' %}active-all{% endif %}"><i class="fas fa-list"></i> All ({{ total }})</a>
+        <a href="?filter=CG" class="filter-tab {% if filter_type == 'CG' %}active-cg{% endif %}"><i class="fas fa-robot"></i> CG ({{ cg_count }})</a>
+        <a href="?filter=OR" class="filter-tab {% if filter_type == 'OR' %}active-or{% endif %}"><i class="fas fa-user-check"></i> OR ({{ or_count }})</a>
+    </div>
+
+    {% if reviews %}
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-card-top">
+                <div>
+                    <div class="review-card-title">{{ review.product_name }}</div>
+                    <div class="review-card-cat"><i class="fas fa-tag"></i> {{ review.get_category_display }}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.75rem; flex-shrink:0">
+                    <span class="badge {% if review.result == 'CG' %}badge-cg{% else %}badge-or{% endif %}">
+                        {% if review.result == 'CG' %}<i class="fas fa-robot"></i>{% else %}<i class="fas fa-user-check"></i>{% endif %}
+                        {{ review.result }}
+                    </span>
+                    <span style="font-size:0.8rem; color:var(--muted)">{{ review.confidence }}%</span>
+                    <a href="/reviews/delete/{{ review.id }}/"
+                       onclick="return confirm('Delete this review?')"
+                       class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+                </div>
+            </div>
+            <div class="review-card-body">{{ review.short_text }}</div>
+            <div class="review-card-footer">
+                <span><i class="fas fa-clock"></i> {{ review.created_at|date:"M d, Y  H:i" }}</span>
+                {% if review.detection_reasons %}
+                <span style="color:var(--gold)"><i class="fas fa-info-circle"></i> {{ review.detection_reasons|truncatechars:80 }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No {{ filter_type|lower }} reviews found.</p>
+            <a href="/reviews/submit/" class="btn btn-primary btn-sm" style="margin-top:1rem"><i class="fas fa-plus"></i> Analyze a Review</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

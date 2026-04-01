@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login — ReviewGuard{% endblock %}
+{% block content %}
+<style>
+.auth-page { min-height: 88vh; display: flex; align-items: center; justify-content: center; padding: 3rem 1.5rem; }
+.auth-card { width: 100%; max-width: 440px; }
+.auth-header { text-align: center; margin-bottom: 2rem; }
+.auth-header h1 { font-size: 2rem; margin-bottom: 0.4rem; }
+.auth-header p { color: var(--muted); font-size: 0.9rem; }
+.auth-logo { font-size: 2.5rem; color: var(--gold); margin-bottom: 1rem; }
+.auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--muted); }
+.auth-footer a { color: var(--teal); text-decoration: none; }
+</style>
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="card card-glow" style="border-color: rgba(245,200,66,0.2)">
+            <div class="auth-header">
+                <div class="auth-logo"><i class="fas fa-user-shield"></i></div>
+                <h1>Admin Login</h1>
+                <p>Restricted access — registered admins only</p>
+            </div>
+            <div style="background:rgba(245,200,66,0.08); border:1px solid rgba(245,200,66,0.2); border-radius:8px; padding:0.7rem 1rem; font-size:0.82rem; color:var(--gold); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem">
+                <i class="fas fa-shield-halved"></i> Only registered admin accounts can access this portal.
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Admin Username</label>
+                    <input type="text" name="username" class="form-input" placeholder="Your admin username" autofocus required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-input" placeholder="Your password" required>
+                </div>
+                <button type="submit" class="btn btn-gold" style="width:100%; justify-content:center; padding:0.8rem; font-size:0.95rem; margin-top:0.5rem">
+                    <i class="fas fa-lock-open"></i> Access Admin Panel
+                </button>
+            </form>
+        </div>
+        <div class="auth-footer">
+            New admin? <a href="/admin-panel/register/">Admin Register</a>
+            &nbsp;·&nbsp; Regular user? <a href="/users/login/">User Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

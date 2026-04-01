@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}How It Works — ReviewGuard{% endblock %}
+{% block content %}
+<style>
+.hiw-hero { padding: 5rem 2rem 3rem; max-width: 700px; margin: 0 auto; text-align: center; }
+.hiw-body { max-width: 900px; margin: 0 auto; padding: 2rem 2rem 5rem; }
+.step-block {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 2rem; margin-bottom: 1.2rem;
+    transition: border-color 0.2s;
+}
+.step-block:hover { border-color: rgba(0,201,167,0.3); }
+.step-num-big {
+    font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800;
+    color: var(--teal); opacity: 0.3; line-height: 1; min-width: 60px;
+}
+.step-block h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+.step-block p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; }
+.features-box { background: rgba(0,201,167,0.05); border: 1px solid rgba(0,201,167,0.2); border-radius: 14px; padding: 2rem; margin: 2rem 0; }
+.features-box h3 { color: var(--teal); margin-bottom: 1.2rem; font-size: 1.1rem; }
+.feature-pills { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.pill {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 20px; padding: 0.35rem 0.9rem;
+    font-size: 0.8rem; color: var(--muted);
+    display: flex; align-items: center; gap: 0.4rem;
+}
+.pill i { color: var(--teal); font-size: 0.75rem; }
+</style>
+<div class="hiw-hero">
+    <div class="section-tag">How It Works</div>
+    <h1 style="font-size:2.8rem; margin-bottom:1rem;">Detection <span style="color:var(--teal)">Pipeline</span> Explained</h1>
+    <p style="color:var(--muted); font-size:0.95rem; line-height:1.8;">Understand exactly how ReviewGuard classifies a review as CG or OR from submission to result.</p>
+</div>
+
+<div class="hiw-body">
+    <div class="step-block">
+        <div class="step-num-big">01</div>
+        <div>
+            <h3><i class="fas fa-user-check" style="color:var(--teal); margin-right:0.5rem"></i>User Submits a Review</h3>
+            <p>A registered user visits the Submit Review page, fills in the product name, category, and pastes or types the review text. A minimum of 20 characters is required. The review is submitted via a secure POST request to the Django backend.</p>
+        </div>
+    </div>
+    <div class="step-block">
+        <div class="step-num-big">02</div>
+        <div>
+            <h3><i class="fas fa-magnifying-glass" style="color:var(--gold); margin-right:0.5rem"></i>Feature Extraction</h3>
+            <p>The <strong>detector.py</strong> engine extracts multiple linguistic features from the review text. Each feature is scored independently and weighted based on its predictive strength for identifying computer-generated content.</p>
+        </div>
+    </div>
+
+    <div class="features-box">
+        <h3><i class="fas fa-list-check"></i> Detection Features Analyzed</h3>
+        <div class="feature-pills">
+            <div class="pill"><i class="fas fa-circle-dot"></i> Review length (word count)</div>
+            <div class="pill"><i class="fas fa-circle-dot"></i> Generic CG phrase matching</div>
+            <div class="pill"><i class="fas fa-circle-dot"></i> Personal pronoun usage</div>
+            <div class="pill"><i class="fas fa-circle-dot"></i> Exclamation / CAPS abuse</div>
+            <div class="pill"><i class="fas fa-circle-dot"></i> Sentence length variance</div>
+            <div class="pill"><i class="fas fa-circle-dot"></i> Informal language markers</div>
+            <div class="pill"><i class="fas fa-circle-dot"></i> Specific personal details</div>
+            <div class="pill"><i class="fas fa-circle-dot"></i> Time/experience references</div>
+        </div>
+    </div>
+
+    <div class="step-block">
+        <div class="step-num-big">03</div>
+        <div>
+            <h3><i class="fas fa-scale-balanced" style="color:var(--red); margin-right:0.5rem"></i>Scoring & Classification</h3>
+            <p>Feature scores are accumulated and compared against a threshold. A score ≥45 classifies the review as <strong style="color:var(--red)">CG (Computer Generated)</strong>. Below 45 classifies it as <strong style="color:var(--teal)">OR (Original Review)</strong>. The confidence percentage is derived from the score distance from the threshold.</p>
+        </div>
+    </div>
+    <div class="step-block">
+        <div class="step-num-big">04</div>
+        <div>
+            <h3><i class="fas fa-database" style="color:#64a0ff; margin-right:0.5rem"></i>Result Stored & Displayed</h3>
+            <p>The result (CG/OR), confidence score, and detection reasons are saved to the database linked to the user's account. The result is instantly shown on screen with visual indicators, and becomes visible in both the user's dashboard and the admin panel for monitoring.</p>
+        </div>
+    </div>
+    <div class="step-block">
+        <div class="step-num-big">05</div>
+        <div>
+            <h3><i class="fas fa-user-shield" style="color:var(--gold); margin-right:0.5rem"></i>Admin Review & Override</h3>
+            <p>Administrators can view all submitted reviews in the Admin Review Management panel. They can flag suspicious entries, manually override classifications with justification, and monitor user activity to ensure system integrity.</p>
+        </div>
+    </div>
+
+    <div style="text-align:center; margin-top:3rem">
+        <a href="/users/register/" class="btn btn-primary" style="padding:0.85rem 2rem; font-size:0.95rem"><i class="fas fa-rocket"></i> Try It Now — It's Free</a>
+    </div>
+</div>
+{% endblock %}
