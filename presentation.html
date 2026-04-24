@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>ReviewGuard Presentation</title>
+
+    <!-- Reveal.js Core CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    
+    <!-- Theme: 'dracula' or 'moon' looks very professional and modern -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/moon.min.css" id="theme">
+
+    <style>
+        /* Custom Styling for extra \"Wow\" factor */
+        .reveal h1, .reveal h2, .reveal h3 {
+            text-transform: none;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            color: #eee8d5;
+        }
+        .reveal h1 {
+            color: #fdf6e3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            font-size: 3.5em;
+        }
+        .reveal .subtitle {
+            font-size: 1.2em;
+            color: #93a1a1;
+            margin-top: 20px;
+        }
+        .reveal P, .reveal ul {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #cccccc;
+        }
+        .reveal .highlight {
+            color: #2aa198; /* Cyan accent */
+            font-weight: bold;
+        }
+        .reveal .highlight-red {
+            color: #dc322f;
+            font-weight: bold;
+        }
+        /* Custom box design for features */
+        .feature-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            display: inline-block;
+            width: 40%;
+            vertical-align: top;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .feature-box h4 {
+            color: #268bd2;
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        .feature-box p {
+            font-size: 0.8em;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            
+            <!-- Slide 1: Title -->
+            <section data-transition="zoom" data-background-gradient="linear-gradient(to bottom, #002b36, #073642)">
+                <h1>ReviewGuard</h1>
+                <p class="subtitle">Intelligent Fake Review Detection System</p>
+                <br>
+                <p style="font-size: 0.8em;">Presented By: <strong>Chethan</strong></p>
+                <p style="font-size: 0.6em; color: #586e75;">Advanced Machine Learning & Web Security</p>
+            </section>
+
+            <!-- Slide 2: The Problem -->
+            <section data-transition="slide">
+                <h2>The <span class="highlight-red">Problem</span></h2>
+                <ul style="font-size: 0.9em; line-height: 1.6;">
+                    <li class="fragment">E-commerce platforms are flooded with <strong>Computer-Generated (CG)</strong> and fabricated reviews.</li>
+                    <li class="fragment">Fake reviews mislead consumers, skew product ratings, and damage brand trust.</li>
+                    <li class="fragment">Standard keyword blocking is ineffective against modern AI tools (like ChatGPT) writing fake text.</li>
+                    <li class="fragment">We need a system that understands <strong>human emotion, quirks, and context</strong>.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 3: The Solution -->
+            <section data-transition="slide">
+                <h2>What is <span class="highlight">ReviewGuard?</span></h2>
+                <p style="font-size: 0.9em;">A full-stack, secure platform that authenticates the validity of product reviews using a <strong>Hybrid NLP + ML Engine</strong>.</p>
+                <br>
+                <div style="display: flex; justify-content: center; gap: 20px;">
+                    <div class="feature-box fragment">
+                        <h4>🤖 Detects Bots</h4>
+                        <p>Identifies repetitive phrasing, absence of personal pronouns, and generic templates.</p>
+                    </div>
+                    <div class="feature-box fragment">
+                        <h4>🧑 Authenticates Humans</h4>
+                        <p>Recognizes conversational tone, specific sizing/usage context, and emotional nuance.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Key Features -->
+            <section data-transition="slide" data-background="#002b36">
+                <h2>Platform Features</h2>
+                <ul style="font-size: 0.85em; width: 80%;">
+                    <li class="fragment"><strong>Dual Authentication System:</strong> Distinct, secure portals for standard Users and Administrators.</li>
+                    <li class="fragment"><strong>Admin Analytics Dashboard:</strong> Live tracking of user activity, total reviews, and systemic fake-vs-real ratios.</li>
+                    <li class="fragment"><strong>Real-time Detection:</strong> Analyzes text locally the moment a user submits the review.</li>
+                    <li class="fragment"><strong>Graceful Offline Mode:</strong> Can operate entirely offline via strict linguistic rule-engines if external ML frameworks fail.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 5: The Technology (Rule Based) -->
+            <section data-transition="fade">
+                <h2>Layer 1: <span class="highlight">The NLP Rules Engine</span></h2>
+                <p style="font-size: 0.8em; text-align: left; padding: 0 10%;">The system scores over 20 distinct data points across two channels:</p>
+                
+                <div style="font-size: 0.7em; text-align: left; padding: 0 10%; margin-top: 20px;">
+                    <p><strong>🔴 Red Flags (Bot Patterns):</strong></p>
+                    <ul>
+                        <li>Hyper-uniform sentence lengths and structure</li>
+                        <li>Over-indexing on marketing buzzwords <em>(\"game-changer\", \"highly recommend\")</em></li>
+                        <li>Zero first-person pronouns <em>(I, my, mine)</em></li>
+                    </ul>
+                    
+                    <p style="margin-top: 20px;"><strong>🟢 Green Flags (Human Patterns):</strong></p>
+                    <ul>
+                        <li>Shorthand typing quirks <em>(thx, gr8, emojis)</em></li>
+                        <li>Detailed physical usage <em>(\"wore them in the rain\", \"my daughter uses it for gym\")</em></li>
+                        <li>Balanced critiques <em>(not 100% purely positive)</em></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 6: The Technology (Machine Learning) -->
+            <section data-transition="fade">
+                <h2>Layer 2: <span class="highlight">DistilBERT Integration</span></h2>
+                <p style="font-size: 0.85em;">Rule-based systems struggle with \"Grey Zone\" text. <br>We integrated HuggingFace Transformers to fix this.</p>
+                <div class="feature-box" style="width: 70%; margin-top: 30px;">
+                    <h4 style="color: #d33682; font-size: 1.1em;">Hybrid Architecture</h3>
+                    <p style="font-size: 1em;">ReviewGuard runs <strong>DistilBERT</strong> (a smaller, faster, cheaper NLP model) to classify subtext.</p>
+                    <p style="font-size: 1em;">The Tensor probabilities are injected directly into the NLP Rule weights, creating an incredibly resilient, high-accuracy detector.</p>
+                </div>
+            </section>
+
+            <!-- Slide 7: Tech Stack -->
+            <section data-transition="convex">
+                <h2>The <span class="highlight">Tech Stack</span></h2>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 40px;">
+                    
+                    <div style="background: white; color: black; padding: 15px 30px; border-radius: 5px; font-weight: bold; width: 25%;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" height="40" style="margin: 0; vertical-align: middle;"> Python
+                    </div>
+                    
+                    <div style="background: white; color: black; padding: 15px 30px; border-radius: 5px; font-weight: bold; width: 25%;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Django_logo.svg" height="40" style="margin: 0; vertical-align: middle;"> Django
+                    </div>
+
+                    <div style="background: white; color: black; padding: 15px 30px; border-radius: 5px; font-weight: bold; width: 25%;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/38/SQLite370.svg" height="40" style="margin: 0; vertical-align: middle;"> SQLite
+                    </div>
+
+                    <div style="background: white; color: black; padding: 15px 30px; border-radius: 5px; font-weight: bold; width: 25%;">
+                        🤗 HuggingFace
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 8: Future Scope -->
+            <section data-transition="slide">
+                <h2>Future <span class="highlight">Scope</span></h2>
+                <ul style="font-size: 0.9em; line-height: 1.8;">
+                    <li class="fragment">Integration as a Chrome Extension for real-time Amazon/Flipkart detection.</li>
+                    <li class="fragment">Fine-tuning a custom local LLM specifically trained on 500,000+ Fake Amazon Reviews.</li>
+                    <li class="fragment">Providing a RESTful API for local businesses to verify their TrustPilot reviews.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 9: Q&A -->
+            <section data-transition="zoom" data-background-gradient="linear-gradient(to top, #002b36, #073642)">
+                <h1>Thank You!</h1>
+                <p class="subtitle">Any Questions?</p>
+                <br>
+                <p style="font-size: 0.7em; color: #586e75;">Project Repository: <a href="#" style="color: #2aa198;">GitHub.com/chethanhrx</a></p>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script>
+        // Initialize the presentation
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide', // none/fade/slide/convex/concave/zoom
+            // Enable slide numbering
+            slideNumber: 'c/t',
+        });
+    </script>
+</body>
+</html>

@@ -63,9 +63,10 @@
                         {{ review.result }}
                     </span>
                     <span style="font-size:0.8rem; color:var(--muted)">{{ review.confidence }}%</span>
-                    <a href="/reviews/delete/{{ review.id }}/"
-                       onclick="return confirm('Delete this review?')"
-                       class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+                    <form method="POST" action="/reviews/delete/{{ review.id }}/" style="display:inline" onclick="return confirm('Delete this review?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                    </form>
                 </div>
             </div>
             <div class="review-card-body">{{ review.short_text }}</div>

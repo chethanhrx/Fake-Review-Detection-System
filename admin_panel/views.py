@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 from datetime import timedelta
 from reviews.models import Review
@@ -144,8 +144,9 @@ def admin_reviews(request):
         reviews = reviews.filter(is_flagged=True)
 
     if search:
-        reviews = reviews.filter(user__username__icontains=search) | \
-                  Review.objects.filter(product_name__icontains=search)
+        reviews = reviews.filter(
+            Q(user__username__icontains=search) | Q(product_name__icontains=search)
+        )
 
     total = Review.objects.count()
     cg_count = Review.objects.filter(result='CG').count()
@@ -184,6 +185,9 @@ def override_result(request, review_id):
 
 @admin_required
 def admin_delete_review(request, review_id):
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request.')
+        return redirect('admin_reviews')
     review = get_object_or_404(Review, id=review_id)
     review.delete()
     messages.success(request, 'Review deleted.')

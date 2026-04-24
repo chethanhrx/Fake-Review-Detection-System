@@ -10,19 +10,17 @@ def submit_review(request):
         return redirect('admin_dashboard')
     result_data = None
     if request.method == 'POST':
-        product_name = request.POST.get('product_name', '').strip()
-        category = request.POST.get('category', 'other')
         review_text = request.POST.get('review_text', '').strip()
-        if not product_name or not review_text:
-            messages.error(request, 'Please fill in all fields.')
+        if not review_text:
+            messages.error(request, 'Please enter a review to analyze.')
         elif len(review_text) < 20:
             messages.error(request, 'Review must be at least 20 characters long.')
         else:
             label, confidence, reasons = detect_review(review_text)
             review = Review.objects.create(
                 user=request.user,
-                product_name=product_name,
-                category=category,
+                product_name='Review Analysis',
+                category='other',
                 review_text=review_text,
                 result=label,
                 confidence=confidence,
@@ -32,13 +30,10 @@ def submit_review(request):
                 'label': label,
                 'confidence': confidence,
                 'reasons': reasons,
-                'product_name': product_name,
                 'review_id': review.id,
             }
-    from .models import CATEGORY_CHOICES
     return render(request, 'reviews/submit.html', {
         'result_data': result_data,
-        'categories': CATEGORY_CHOICES,
     })
 
 @login_required
@@ -61,6 +56,9 @@ def my_reviews(request):
 
 @login_required
 def delete_review(request, review_id):
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request.')
+        return redirect('my_reviews')
     review = get_object_or_404(Review, id=review_id, user=request.user)
     review.delete()
     messages.success(request, 'Review deleted successfully.')

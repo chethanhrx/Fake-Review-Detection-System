@@ -80,4 +80,10 @@ LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/users/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://127.0.0.1:46673',
+]
+
 ADMIN_SECRET_KEY = 'REVIEWGUARD-ADMIN-2024'
